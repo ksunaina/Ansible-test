@@ -1,0 +1,23 @@
+---
+- hosts: all
+  vars:
+    - config: "{{ playbook_dir }}/oneview_config.json"
+    - contents: "{{lookup('file', config)}}"
+  tasks:
+    - name: Gather facts about all Server Hardwares
+      oneview_server_hardware_facts:
+        config: "{{ config }}"
+      register: server_list
+      delegate_to: localhost
+
+
+
+    - name: Create dictionary to server names and model
+      set_fact:
+        server_names_dict: "{{ server_list.ansible_facts.server_hardwares | items2dict(key_name='name', value_name='model') }}"
+
+
+
+    - name: Show server names and models
+      debug:
+        var: server_names_dict
